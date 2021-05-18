@@ -29,7 +29,7 @@ class SmallConvNet(nn.Module):
         return x
 
 class ModelTrainer:
-    def __init__(self, net, train_dataloader, test_dataloader, learning_rate=0.0001, num_epochs=5):
+    def __init__(self, net, train_dataloader, test_dataloader, learning_rate=0.0001, num_epochs=5, num_classes=2):
         self.net = net
         self.train_dataloader = train_dataloader
         self.test_dataloader = test_dataloader
@@ -37,6 +37,7 @@ class ModelTrainer:
         self.optimizer = optim.Adam(net.parameters(), learning_rate)
         self.num_epochs = num_epochs
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+        self.classes = num_classes
 
     def train(self):
         self.net.to(self.device)
@@ -76,15 +77,15 @@ class ModelTrainer:
     def test(self):
         self.net.eval()
 
-        class_correct = list(0. for i in range(len(classes)))
-        class_total = list(0. for i in range(len(classes)))
+        class_correct = list(0. for i in range(len(self.classes)))
+        class_total = list(0. for i in range(len(self.classes)))
 
         overall_correct = 0
         overall_total = 0
         loss = 0.0
 
         with torch.no_grad():
-            for data in testloader:
+            for data in self.test_dataloader:
                 images, labels = data[0].to(self.device), data[1].to(self.device)
                 outputs = self.net(images)
                 loss += self.loss_criterioncriterion(outputs, labels).item()
@@ -100,9 +101,9 @@ class ModelTrainer:
         overall_accuracy = overall_correct / overall_total
         print(f'Overall Accuracy: {overall_accuracy}')
 
-        for i in range(len(classes)):
+        for i in range(len(self.classes)):
             print('Accuracy of %5s : %2d %%' % (
-                classes[i], 100 * class_correct[i] / class_total[i]))
+                self.classes[i], 100 * class_correct[i] / class_total[i]))
 
 
 
@@ -125,5 +126,5 @@ if __name__ == '__main__':
     train_dataloader = torch.utils.data.DataLoader(dataset=dataset, batch_size=batch_size, shuffle=True)
 
     model = SmallConvNet()
-    trainer = ModelTrainer(model, train_dataloader, None)
+    trainer = ModelTrainer(model, train_dataloader, None, num_classes=43)
     trainer.train()
