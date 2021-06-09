@@ -6,8 +6,7 @@ import time
 from model_trainer import ModelTrainer
 from models import TimeSeriesConvModel, FullyConnectedNet
 
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import accuracy_score
+
 
 ### Hyperparameters ###
 batch_size = 128# benchmarks with 128
@@ -21,17 +20,6 @@ x_test, y_test = readucr(root_url + "FordA_TEST.tsv")
 
 y_train[y_train == -1] = 0
 y_test[y_test == -1] = 0
-
-
-print("Starting training of random forest classifier")
-clf = RandomForestClassifier()
-clf.fit(x_train, y_train)
-
-predictions = clf.predict(x_test)
-accuracy = accuracy_score(predictions, y_test)
-print(f"Accuracy of Random Forest: {accuracy}")
-
-
 
 x_train, y_train = torch.from_numpy(x_train).float(), torch.from_numpy(y_train).float()
 x_test, y_test = torch.from_numpy(x_test).float(), torch.from_numpy(y_test).float()

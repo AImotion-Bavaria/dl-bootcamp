@@ -3,7 +3,8 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import time
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score, confusion_matrix, ConfusionMatrixDisplay
+import matplotlib.pyplot as plt
 
 class ModelTrainer:
     def __init__(self, net, train_dataloader, test_dataloader, loss_criterion=nn.BCELoss(), learning_rate=0.0001, num_epochs=5, num_classes=2):
@@ -66,16 +67,26 @@ class ModelTrainer:
         overall_total = 0
         loss = 0.0
 
+        all_preds = []
+        all_labels = []
+
         with torch.no_grad():
             for data in self.test_dataloader:
                 images, labels = data[0].to(self.device), data[1].to(self.device)
-                # labels = torch.squeeze(labels)
+                labels = torch.squeeze(labels)
                 outputs = self.net(images)
-                if self.classes > 2:
-                    outputs = torch.argmax(outputs)
+                """if self.classes > 2:
+                    outputs = torch.argmax(outputs)"""
+
+                
 
                 loss += self.loss_criterion(outputs, labels).item()
-                _, predicted = torch.max(outputs, 1)
+
+                _, predicted = torch.max(outputs, 1) # equivalent to argmax
+
+                all_preds.extend(predicted.cpu())
+                all_labels.extend(labels.cpu())
+
                 overall_total += labels.size(0)
                 overall_correct += (predicted == labels).sum().item()
                 correct = (predicted == labels).squeeze()
@@ -90,6 +101,11 @@ class ModelTrainer:
         for i in range(self.classes):
             print('Accuracy of %5s : %2d %%' % (
                 i, 100 * class_correct[i] / class_total[i]))
+
+        conf_matrix = confusion_matrix(all_labels, all_preds )
+        display = ConfusionMatrixDisplay(confusion_matrix=conf_matrix)
+        display.plot()
+        plt.show()
 
     def binary_test(self):
         self.net.eval()
@@ -107,5 +123,9 @@ class ModelTrainer:
                 all_labels.extend(labels.cpu())
 
         
-        accuracy = accuracy_score(all_preds, all_labels)
+        accuracy = accuracy_score(all_labels, all_preds)
+        conf_matrix = confusion_matrix(all_labels, all_preds)
         print(f"Overall Accuracy: {accuracy}")
+        display = ConfusionMatrixDisplay(confusion_matrix=conf_matrix)
+        display.plot()
+        plt.show()

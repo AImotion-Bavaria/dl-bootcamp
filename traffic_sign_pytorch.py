@@ -17,7 +17,8 @@ from models import FullyConnectedNet, SmallConvNet
 
 ### Hyperparameters ###
 batch_size = 32
-num_epochs = 100
+num_epochs = 5
+lr = 0.0001
 ######################
 
 
@@ -53,7 +54,7 @@ model.fc = nn.Linear(model.fc.in_features, 43)
 
 # model = FullyConnectedNet()
 
-trainer = ModelTrainer(model, train_dataloader, test_dataloader, loss_criterion=nn.CrossEntropyLoss(), num_epochs=num_epochs, num_classes=43)
+trainer = ModelTrainer(model, train_dataloader, test_dataloader, loss_criterion=nn.CrossEntropyLoss(), learning_rate=lr, num_epochs=num_epochs, num_classes=43)
 trainer.train()
 print("Training finished. Starting evaluation.")
-trainer.mulitclass_test()
+trainer.multiclass_test()
