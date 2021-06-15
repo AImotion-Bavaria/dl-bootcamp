@@ -17,7 +17,7 @@ from models import FullyConnectedNet, SmallConvNet
 
 ### Hyperparameters ###
 batch_size = 32
-num_epochs = 5
+num_epochs = 50
 lr = 0.0001
 ######################
 
@@ -26,18 +26,18 @@ data_root_path = Path("C:/Arbeit/datasets/traffic_sign")
 train_path = data_root_path / "Train"
 test_path = data_root_path / "Test"
 
-"""transforms = transforms.Compose([
+transforms = transforms.Compose([
     transforms.Grayscale(),
     transforms.Resize((32, 32)),
     transforms.ToTensor()
-])"""
+])
 
-transforms = transforms.Compose([
+"""transforms = transforms.Compose([
     transforms.Resize((224, 224)),
     transforms.ToTensor(),
     transforms.Normalize(mean=[0.485, 0.456, 0.406],
                                 std=[0.229, 0.224, 0.225])
-])
+])"""
 
 
 # train_set = torchvision.datasets.ImageFolder(str(train_path), transform=transforms)
@@ -49,10 +49,10 @@ test_dataloader = torch.utils.data.DataLoader(dataset=test_set, batch_size=batch
 
 # model = SmallConvNet()
 
-model = torchvision.models.resnext50_32x4d(pretrained=True)
-model.fc = nn.Linear(model.fc.in_features, 43)
+# model = torchvision.models.resnext50_32x4d(pretrained=True)
+# model.fc = nn.Linear(model.fc.in_features, 43)
 
-# model = FullyConnectedNet()
+model = FullyConnectedNet()
 
 trainer = ModelTrainer(model, train_dataloader, test_dataloader, loss_criterion=nn.CrossEntropyLoss(), learning_rate=lr, num_epochs=num_epochs, num_classes=43)
 trainer.train()
