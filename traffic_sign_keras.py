@@ -8,11 +8,13 @@ import pandas
 
 from tensorflow import keras
 from tensorflow.keras import layers
+from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
+import matplotlib.pyplot as plt
 
 #### Config ####
 image_size = 45
 batch_size = 64
-num_epochs = 25
+num_epochs = 5
 learning_rate = 0.001
 num_classes = 43
 #################
@@ -126,5 +128,12 @@ print("#######################")
 
 test_images, test_labels = load_csv(test_path, data_root_path)
 model.evaluate(test_images, test_labels)
+
+predictions = model.predict(test_images)
+predictions = np.argmax(predictions, axis=1)
+conf_matrix = confusion_matrix(np.argmax(test_labels, axis=1), predictions)
+display = ConfusionMatrixDisplay(confusion_matrix=conf_matrix)
+display.plot()
+plt.show()
 
 print("Happy debug")
