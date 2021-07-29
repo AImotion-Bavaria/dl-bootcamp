@@ -33,7 +33,7 @@ def pretrained_model(num_classes=num_classes):
     # base_model.trainable = False
 
     inputs = keras.Input(shape=(image_size, image_size, 3))
-    x = base_model(inputs, training=True)
+    x = base_model(inputs, training=False)
     x = keras.layers.GlobalAveragePooling2D()(x)
     outputs = keras.layers.Dense(num_classes, activation="sigmoid")(x)
 
